@@ -1,0 +1,104 @@
+.body {
+  width: 100%;
+  height: 100vh;
+}
+
+body,
+button {
+  font-family: "Manrope", sans-serif;
+}
+
+.main {
+  padding: 50px 50px;
+}
+
+.main__bg__img {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -6;
+  opacity: 0.3;
+}
+
+.site__title {
+  font-size: 50px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 75px;
+}
+
+.input__list {
+  width: 79%;
+  margin: 0 auto;
+}
+
+.input__list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 20px;
+  padding-bottom: 40px;
+}
+
+.input__title {
+  font-size: 30px;
+}
+
+.main__input {
+  width: 60%;
+  height: 45px;
+  font-size: 20px;
+  padding-left: 20px;
+  border-radius: 30px;
+  border: none;
+  outline: 2px solid rgb(45, 130, 241);
+  cursor: pointer;
+}
+
+.input__file {
+  width: 30%;
+  background-color: white;
+  padding-left: 5%;
+}
+
+.input__date {
+  width: 20%;
+  position: relative;
+  text-align: center;
+  padding: 0;
+}
+.input__date {
+  transition: all 0.4s ease;
+}
+
+.input__date:focus-visible {
+  margin-bottom: 200px;
+}
+
+.input__date::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  color: transparent;
+  background: transparent;
+}
+
+.main__button-wrapper{
+    margin: 0 auto;
+    width: 30%;
+}
+
+.main__button {
+  background-color: green;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+
+  font-size: 15px;
+
+  padding: 15px 15px;
+}
