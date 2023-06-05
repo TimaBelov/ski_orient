@@ -27,3 +27,16 @@
   background-color: #fff;
   color: #221c4c;
 }
+
+@media (max-width: 1199px) {
+    .event_docs{
+        padding-top: 100px;
+    }
+    .event_docs__item{
+        margin-bottom: 40px;
+    }
+    .event_docs__link{
+        font-size: 26px;
+        line-height: 35px;
+    }
+}
