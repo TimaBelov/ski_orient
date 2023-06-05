@@ -1,0 +1,14 @@
+.header{
+    background-color: #221C4C;
+}
+
+.header__title{
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 65px;
+
+    color: white;
+
+    padding: 17px 0;
+    padding-left: 100px;
+}
