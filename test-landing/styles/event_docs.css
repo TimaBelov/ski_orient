@@ -38,5 +38,18 @@
     .event_docs__link{
         font-size: 26px;
         line-height: 35px;
+        padding: 7px 25px;
+    }
+}
+
+@media (max-width: 767px) {
+    .event_docs{
+        padding-top: 50px;
+        margin-bottom: 25px;
+    }
+    .event_docs__link{
+        font-size: 20px;
+        line-height: 27px;
+        padding: 5px 15px;
     }
 }

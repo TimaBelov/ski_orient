@@ -17,10 +17,35 @@
   text-align: center;
 }
 
+.for_small_screen{
+  display: none;
+}
+.for_large_screen{
+  display: inline;
+}
+
 @media (max-width: 1199px) {
   .main__title{
     font-size: 40px;
     line-height: 54px;
     padding-top: 50px;
+  }
+}
+
+@media (max-width: 767px) {
+  .bg__img{
+    width: auto;
+    height: 100%;
+  }
+  .main__title{
+    font-size: 24px;
+    line-height: 32px;
+    padding-top: 25px;
+  }
+  .for_small_screen{
+    display: inline;
+  }
+  .for_large_screen{
+    display: none;
   }
 }
