@@ -1,6 +1,7 @@
 @import url(header.css);
 @import url(main.css);
+@import url(event_docs.css);
 
-html{
-    font-family: 'Manrope',sans-serif;
+html {
+  font-family: "Manrope", sans-serif;
 }
