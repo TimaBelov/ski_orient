@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+     
+    <title>Start List - SportOrg</title>
+      
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  p,
+  blockquote,
+  ul,
+  ol,
+  dl,
+  table,
+  pre {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  table.sportorg-table {
+    display: block;
+    width: 100%;
+    overflow: visible;
+    word-break: keep-all;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  table.sportorg-table th {
+    font-weight: bold;
+    border-bottom: 2px solid black;
+    margin-bottom: 5px;
+  }
+
+  table.sportorg-table th,
+  table.sportorg-table td {
+    padding: 3px 13px;
+    text-align: left;
+    /*border: 1px solid #ddd;*/
+  }
+
+  table.sportorg-table tr {
+    background-color: #fff;
+    /*border-top: 1px solid #ccc;*/
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /*table.sportorg-table tr:nth-child(2n) {*/
+  /*background-color: #f8f8f8;*/
+  /*}*/
+
+  table.empty-table {
+    width: auto;
+  }
+
+  table.empty-table tr {
+    background-color: white;
+    border: 0;
+  }
+
+  table.empty-table td,
+  table.empty-table th {
+    border: 0;
+  }
+
+  hr {
+    box-sizing: content-box;
+    height: 0;
+  }
+
+  hr {
+    height: 0;
+    margin: 15px 0;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  hr:before {
+    display: table;
+    content: "";
+  }
+
+  hr:after {
+    display: table;
+    clear: both;
+    content: "";
+  }
+
+  hr {
+    height: 4px;
+    padding: 0;
+    margin: 16px 0;
+    background-color: #e7e7e7;
+    border: 0 none;
+  }
+
+  a:not([href]) {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a {
+    color: #4078c0;
+    text-decoration: none;
+  }
+
+  a:hover,
+  a:active {
+    text-decoration: underline;
+  }
+
+  a {
+    background-color: transparent;
+  }
+
+  a:active,
+  a:hover {
+    outline: 0;
+  }
+
+  .print-only {
+    display: none;
+  }
+
+  .no-print {
+    display: block;
+  }
+
+  .nowrap {
+    white-space: nowrap;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  /* SPLITS */
+
+  .table-leg {
+    padding: 0;
+    margin: 0;
+  }
+
+  .table-leg th,
+  .table-leg td {
+    border: 0;
+  }
+
+  .table-leg tr {
+    border-top: 0;
+  }
+
+  .result-1,
+  .result-2,
+  .result-3 {
+    font-weight: bold;
+  }
+
+  .result-1 {
+    /*background: gold;*/
+  }
+
+  .result-2 {
+    /*background: silver;*/
+  }
+
+  .result-3 {
+    /*background: #cd7f32;*/
+  }
+
+  @media print {
+    @page {
+      margin: 0.5cm;
+    }
+
+    body {
+      font-size: 85%;
+    }
+
+    table.sportorg-table {
+      display: table;
+      width: 100%;
+    }
+
+    table.sportorg-table th,
+    table.sportorg-table td {
+      padding: 1px 10px;
+    }
+
+    table.sportorg-table,
+    pre {
+      margin-bottom: 1px;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin: 1px 0;
+    }
+
+    section,
+    .new-page {
+      page-break-before: always;
+    }
+
+    ul {
+      page-break-inside: avoid;
+    }
+
+    p {
+      widows: 4;
+    }
+
+    a[href^="http"]:after {
+      content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+      content: " (" attr(title) ")";
+    }
+
+    .print-only {
+      display: inline;
+    }
+
+    .no-print {
+      display: none;
+    }
+  }
+</style>
+ 
+<style>
+    /* SETTINGS */
+    .sportorg-settings {
+        position: fixed;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        background: white;
+        top: 3px;
+        right: 3px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .sportorg-settings-row {
+        margin: 5px;
+    }
+
+    @media print {
+        .sportorg-settings {
+            display: none;
+        }
+    }
+</style>
+<script>
+    var MAX_ORG_NAME = 30;
+    var MAX_PERSON_NAME = 30;
+
+    var TableGenerator = (function () {
+        var Table = function () {
+            return document.createElement('table');
+        };
+        var THead = function () {
+            return document.createElement('thead');
+        };
+        var TBody = function () {
+            return document.createElement('tbody');
+        };
+        var Tr = function () {
+            return document.createElement('tr');
+        };
+        var Th = function () {
+            return document.createElement('th');
+        };
+        var Td = function () {
+            return document.createElement('td');
+        };
+
+        function TableGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableGenerator.prototype.getTable = function (options) {
+            var table = Table();
+            if (options && options.className) table.className = options.className;
+            table.appendChild(this.getHead());
+            table.appendChild(this.getBody());
+            return table;
+        };
+
+        TableGenerator.prototype.getHead = function () {
+            var tr = Tr();
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var th = Th();
+                var title = this.getHeaderName(key);
+                if (title instanceof Node) {
+                    th.appendChild(title);
+                }
+                else {
+                    th.appendChild(document.createTextNode(title));
+                }
+                tr.appendChild(th);
+            }
+            var thead = THead();
+            thead.appendChild(tr);
+            return thead;
+        };
+
+        TableGenerator.prototype.getBody = function () {
+            var tbody = TBody();
+            var cols = this.headers().length;
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                var tr = Tr();
+                if (obj instanceof Node || typeof obj === 'string') {
+                    var td = Td();
+                    td.colSpan = cols;
+                    if (typeof obj === 'string') {
+                        td.appendChild(document.createTextNode(obj));
+                    }
+                    else {
+                        td.appendChild(obj);
+                    }
+                    tr.appendChild(td);
+                }
+                else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var td = Td();
+                        if (obj[key]) {
+                            if (obj[key] instanceof Node) {
+                                td.appendChild(obj[key]);
+                            }
+                            else {
+                                td.appendChild(document.createTextNode(obj[key]));
+                            }
+                        }
+                        tr.appendChild(td);
+                    }
+                }
+                tbody.appendChild(tr);
+            }
+            return tbody;
+        };
+
+        TableGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        return TableGenerator
+    }());
+
+    var TableTextGenerator = (function () {
+
+        function TableTextGenerator(data, fields) {
+            this.data = data;
+            this.fields = fields;
+        }
+
+        TableTextGenerator.prototype.getTable = function (options) {
+            var node = document.createElement('pre');
+            if (options && options.className) node.className = options.className;
+            node.appendChild(this.getHead());
+            node.appendChild(this.getBody());
+            return node;
+        };
+
+        TableTextGenerator.prototype.getSliceText = function (text, size) {
+            if (text === undefined) {
+                text = '';
+            }
+            text = String(text);
+            if (size) {
+                text = text.slice(0, size);
+                if (text.length < size + 1) {
+                    var arr = [];
+                    for (var i = 0; i < size + 1 - text.length; i++) {
+                        arr.push(' ');
+                    }
+                    text += arr.join('');
+                }
+            } else {
+                text += '\t';
+            }
+            return text;
+        };
+
+        TableTextGenerator.prototype.getHead = function () {
+            var text = '';
+            for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                var h = this.getHeaderObj(key);
+                var title = h && h.title;
+                var size = h && h.size;
+                if (size) {
+                    text += this.getSliceText(title, size);
+                } else {
+                    text += title;
+                }
+            }
+            text += '\n';
+            var blockU = document.createElement('u');
+            var blockB = document.createElement('b');
+            blockB.appendChild(document.createTextNode(text));
+            blockU.appendChild(blockB);
+            return blockU;
+        };
+
+        TableTextGenerator.prototype.getBody = function () {
+            var text = '';
+            for (var _b = 0, _c = this.data; _b < _c.length; _b++) {
+                var obj = _c[_b];
+                if (typeof obj === 'string') {
+                    text += obj;
+                } else {
+                    for (var _i = 0, _a = this.headers(); _i < _a.length; _i++) {
+                        var key = _a[_i];
+                        var h = this.getHeaderObj(key);
+                        var size = h && h.size;
+                        if (size) {
+                            text += this.getSliceText(obj[key], size);
+                        } else {
+                            text += obj[key];
+                        }
+                    }
+                }
+                text += '\n';
+            }
+            return document.createTextNode(text);
+        };
+
+        TableTextGenerator.prototype.headers = function () {
+            if (this._headers) {
+                return this._headers
+            }
+            if (!this.fields) {
+                var headers = {};
+                for (var _i = 0, _a = this.data; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    for (var key in obj) {
+                        headers[key] = true;
+                    }
+                }
+                this._headers = Object.keys(headers)
+            } else if (this.fields instanceof Array) {
+                this._headers = [];
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'string') {
+                        this._headers.push(field);
+                    }
+                    else if (field.active !== false) {
+                        this._headers.push(field.key);
+                    }
+                }
+            }
+            return this._headers;
+        };
+
+        TableTextGenerator.prototype.getHeaderName = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field.title;
+                    }
+                }
+            }
+            return key;
+        };
+
+        TableTextGenerator.prototype.getHeaderObj = function (key) {
+            if (this.fields && this.fields instanceof Array) {
+                for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+                    var field = _a[_i];
+                    if (typeof field === 'object' && field.key === key) {
+                        return field;
+                    }
+                }
+            }
+        };
+
+        return TableTextGenerator
+    }());
+
+    var SettingsGenerator = (function () {
+        var Block = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings';
+            return el
+        };
+        var Row = function () {
+            var el = document.createElement('div');
+            el.className = 'sportorg-settings-row';
+            return el
+        };
+
+        function SettingsGenerator(settings) {
+            this.settings = settings;
+            this.isShow = true;
+        }
+
+        SettingsGenerator.prototype.show = function () {
+            var block = Block();
+            this.el = block;
+            for (var _i = 0, _a = this.settings; _i < _a.length; _i++) {
+                var setting = _a[_i];
+                var row = Row();
+                row.className = row.className + ' ' + 'sportorg-settings-hidden';
+                row.appendChild(this.getElBySetting(setting));
+                block.appendChild(row);
+            }
+            var btn = Row();
+            btn.appendChild(this.getHiddenButton());
+            block.appendChild(btn);
+            document.body.appendChild(block);
+            this.toggleHidden();
+        };
+        SettingsGenerator.prototype.getElBySetting = function (setting) {
+            if (typeof setting.value === 'boolean') {
+                var i = document.createElement('input');
+                i.type = 'checkbox';
+                if (setting.value) {
+                    i.checked = true;
+                }
+                if (setting.change) {
+                    i.onchange = function () {
+                        if (i.checked !== setting.value) {
+                            setting.change(i.checked);
+                            setting.value = i.checked;
+                        }
+                    }
+                }
+                var label = document.createElement('label');
+                label.appendChild(i);
+                label.appendChild(document.createTextNode(setting.title));
+                return label
+            } else if (setting.value instanceof Array) {
+                var s = document.createElement('select');
+                for (var _i = 0, _a = setting.value; _i < _a.length; _i++) {
+                    var obj = _a[_i];
+                    s.appendChild(new Option(obj.text, obj.value));
+                }
+                if (setting.change) {
+                    s.onchange = function () {
+                        var results = [];
+                        for (var _i = 0, _a = s.selectedOptions; _i < _a.length; _i++) {
+                            var item = _a[_i];
+                            results.push(item.value);
+                        }
+                        setting.change(results);
+                    };
+                }
+                var label = document.createElement('label');
+                label.appendChild(document.createTextNode(setting.title));
+                label.appendChild(s);
+                return label
+            }
+        };
+        SettingsGenerator.prototype.toggleHidden = function () {
+            var els = document.getElementsByClassName('sportorg-settings-hidden');
+            for (var _i = 0, els_ = els; _i < els_.length; _i++) {
+                var el = els_[_i];
+                if (this.isShow) {
+                    el.style.display = 'none';
+                    if (this.el) {
+                        this.el.style.opacity = '.3';
+                    }
+                }
+                else {
+                    el.style.display = 'block';
+                    if (this.el) {
+                        this.el.style.opacity = '1';
+                    }
+                }
+            }
+            this.isShow = !this.isShow;
+        };
+        SettingsGenerator.prototype.getHiddenButton = function () {
+            var el = document.createElement('button');
+            el.appendChild(document.createTextNode('SETTINGS'));
+            var _this = this;
+            el.onclick = function (ev) { _this.toggleHidden() };
+            return el;
+        };
+        return SettingsGenerator;
+    }());
+
+    function toHHMMSS(value) {
+        if (value === 0) {
+            return '00:00:00'
+        }
+        if (!value) return '';
+        value /= 1000;
+        var hours = Math.floor(value / 3600);
+        value %= 3600;
+        var minutes = Math.floor(value / 60);
+        var seconds = ~~(value % 60);
+
+        var date = new Date(2000, 0, 1, hours, minutes, seconds);
+
+        var with0 = function (dd) {
+            return (dd < 10 ? '0' + dd : dd) + '';
+        };
+
+        return with0(date.getHours()) + ':' + with0(date.getMinutes()) + ':' + with0(date.getSeconds());
+    }
+
+    function getById(list, id) {
+        if (id) {
+            for (var _i = 0, list_ = list; _i < list_.length; _i++) {
+                var obj = list_[_i];
+                if (obj.id === id) {
+                    return obj;
+                }
+            }
+        }
+        return null;
+    }
+
+    function racePreparation(race) {
+        for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+            var obj = _a[_i];
+            obj.organization = getById(race.organizations, obj.organization_id);
+            obj.group = getById(race.groups, obj.group_id);
+        }
+        for (var _b = 0, _c = race.results; _b < _c.length; _b++) {
+            var obj = _c[_b];
+            obj.status = obj.status === 16 ? 1 : obj.status;
+            obj.person = getById(race.persons, obj.person_id);
+        }
+        for (var _d = 0, _e = race.groups; _d < _e.length; _d++) {
+            var obj = _e[_d];
+            obj.course = getById(race.courses, obj.course_id);
+        }
+        for (var _f = 0, _g = ['groups', 'courses', 'organizations']; _f < _g.length; _f++) {
+            var itemName = _g[_f];
+            race[itemName].sort(function (a, b) {
+                if (a.name.toUpperCase() < b.name.toUpperCase())
+                    return -1;
+                if (a.name.toUpperCase() > b.name.toUpperCase())
+                    return 1;
+                return 0;
+            });
+        }
+        return race;
+    }
+
+    function getGroupsBlockElement(race) {
+        var groupBlock = document.createElement('div');
+        groupBlock.className = 'no-print';
+        for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+            var group = _a[_i];
+            var a = document.createElement('a');
+            a.href = '#' + group.name;
+            a.appendChild(document.createTextNode(group.name + ' '));
+            groupBlock.appendChild(a);
+        }
+        return groupBlock;
+    }
+
+    function dateFormat(date) {
+        date = date ? new Date(date) : new Date();
+		return date.getDate().toString().padStart(2,'0')  + '.' + (date.getMonth() + 1).toString().padStart(2,'0') + '.' + date.getFullYear();
+    }
+
+    var Qualification = {
+        '': 'б/р',
+        0: 'б/р',
+        3: 'IIIю',
+        2: 'IIю',
+        1: 'Iю',
+        6: 'III',
+        5: 'II',
+        4: 'I',
+        7: 'КМС',
+        8: 'МС',
+        9: 'МСМК'
+    };
+
+    var STATUS_PRIORITY = [8, 4, 3, 5, 13];
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    }
+</script>
+
+  </head>
+  <body>
+    <div id="content">
+<div class="text-center">
+  <h3>
+    Всероссийские спортивные игры школьников "Президентские спортивные игры" <br />
+    08.06.2023 г.Тверь, Дорошиха
+  </h3>
+  <h2>ПРОТОКОЛ СТАРТА</h2>
+</div>
+<div id="start-list-tables"></div>
+<div>
+  <table class="empty-table">
+    <tr>
+      <td><b>Главный судья:</b></td>
+      <td width="150px"></td>
+      <td><b></b></td>
+    </tr>
+    <tr>
+      <td><b>Главный секретарь:</b></td>
+      <td width="150px"></td>
+      <td><b></b></td>
+    </tr>
+  </table>
+</div>
+  
+<script>
+  var race = {"courses": [], "data": {"chief_referee": "", "description": "Всероссийские спортивные игры школьников \"Президентские спортивные игры\"", "end_datetime": "2023-06-08 13:00:00", "location": "г.Тверь, Дорошиха", "race_type": 0, "relay_leg_count": 3, "secretary": "", "start_datetime": "2023-06-08 11:00:00", "title": "\"Президентские спортивные игры\"", "url": ""}, "groups": [{"__type": null, "count_finished": 0, "count_person": 16, "course_id": null, "first_number": 0, "id": "4597d989-e12b-46b9-baff-d2282820c529", "is_any_course": false, "long_name": "Юноши", "max_age": 0, "max_time": 0, "max_year": 0, "min_age": 0, "min_year": 0, "name": "Юноши", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": false, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": false, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": false, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 1, "start_interval": 0}, {"__type": null, "count_finished": 0, "count_person": 16, "course_id": null, "first_number": 0, "id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "is_any_course": false, "long_name": "Девушки", "max_age": 0, "max_time": 0, "max_year": 0, "min_age": 0, "min_year": 0, "name": "Девушки", "object": "Group", "order_in_corridor": 0, "price": 0, "ranking": {"is_active": false, "rank": [{"is_active": false, "max_place": "2", "max_time": null, "min_scores": null, "percent": 0, "qual": 8, "use_scores": false}, {"is_active": false, "max_place": "6", "max_time": null, "min_scores": null, "percent": 0, "qual": 7, "use_scores": false}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 4, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 5, "use_scores": true}, {"is_active": true, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 6, "use_scores": true}, {"is_active": false, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 1, "use_scores": true}, {"is_active": false, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 2, "use_scores": true}, {"is_active": false, "max_place": "0", "max_time": null, "min_scores": null, "percent": 0, "qual": 3, "use_scores": true}], "rank_scores": 0}, "relay_legs": 0, "sex": 0, "start_corridor": 2, "start_interval": 0}], "id": "97ee5ae1-193b-49b1-8028-99a0ff716a99", "object": "Race", "organizations": [{"code": "", "contact": "+79108435984 Трошенкова Анна", "count_person": 4, "country": "", "id": "3edace97-12a0-4154-949a-31feed48b69f", "name": "МБОУ СОШ №1", "object": "Organization", "region": "", "sex": 0}, {"code": "", "contact": "+79108329129 Смирнова Ирина", "count_person": 4, "country": "", "id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "name": "МОУ СОШ № 1", "object": "Organization", "region": "", "sex": 0}, {"code": "", "contact": "+79157472086 Осипенко Любовь", "count_person": 4, "country": "", "id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "name": "МБОУ СОШ №19", "object": "Organization", "region": "", "sex": 0}, {"code": "", "contact": "+79115786769 Alex Paha", "count_person": 4, "country": "", "id": "1cc4ed64-02e4-487b-bcc6-445780054527", "name": "СКОК СОШ ЗАТО Солнечный", "object": "Organization", "region": "", "sex": 0}], "persons": [{"bib": 102, "birth_date": "2008-01-01", "card_number": 102, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "02686d73-fe44-455b-ab03-a1026134f1cc", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Злата Денисовна", "national_code": 0, "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 39720000, "surname": "Москвитина", "world_code": "", "year": 2008}, {"bib": 104, "birth_date": "2008-01-01", "card_number": 104, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "8ec97e4f-a934-416a-8845-6ed46d5b8c1a", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Полина Александровна", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 39840000, "surname": "Юркова", "world_code": "", "year": 2008}, {"bib": 106, "birth_date": "2009-01-01", "card_number": 106, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "f57a0d7d-6dd7-4649-a44d-1f05c2def8ea", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Алена Александровна", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 39960000, "surname": "Дроздова", "world_code": "", "year": 2009}, {"bib": 108, "birth_date": "2008-01-01", "card_number": 108, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "3bb7a91b-fbd7-4bcf-8341-6651b6d2f752", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Софья Алексеевна", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40080000, "surname": "Артеменко", "world_code": "", "year": 2008}, {"bib": 110, "birth_date": "2009-01-01", "card_number": 110, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "2f422efc-7328-4b9e-9701-4286d1f4fe4f", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Ксения Игоревна", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40200000, "surname": "Егорова", "world_code": "", "year": 2009}, {"bib": 112, "birth_date": "2008-01-01", "card_number": 112, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "18d2f0c3-d616-4b16-88bf-207a5bf9ed46", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "София Александровна", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40320000, "surname": "Виноградова", "world_code": "", "year": 2008}, {"bib": 114, "birth_date": "2009-01-01", "card_number": 114, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "37c0e72d-32e6-4b08-b304-03e04f2eef00", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Екатерина Андреевна", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40440000, "surname": "Токарчук", "world_code": "", "year": 2009}, {"bib": 116, "birth_date": "2008-01-01", "card_number": 116, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "30502abf-c639-426d-94dc-593b322e538f", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Арина Сергеевна", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40560000, "surname": "Куденко", "world_code": "", "year": 2008}, {"bib": 118, "birth_date": "2008-01-01", "card_number": 118, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "d9b64fa3-bd87-4d33-9a17-1de0d526d3e0", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Дарья Сергеевна", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40680000, "surname": "Морозова", "world_code": "", "year": 2008}, {"bib": 120, "birth_date": "2009-01-01", "card_number": 120, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "7f85802c-c5f0-4163-8ae2-e2183da7f24d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Валентина Олеговна", "national_code": 0, "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40800000, "surname": "Рыбкина", "world_code": "", "year": 2009}, {"bib": 122, "birth_date": "2008-01-01", "card_number": 122, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "c2010880-0a95-4a2c-b0ca-2f4cf6189dd0", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Елизавета Владиславовна", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40920000, "surname": "Воронина", "world_code": "", "year": 2008}, {"bib": 124, "birth_date": "2009-01-01", "card_number": 124, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "4772d2df-b9f0-42f1-bd9f-dd30189357c8", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Наталья Алексеевна", "national_code": 0, "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41040000, "surname": "Калябина", "world_code": "", "year": 2009}, {"bib": 126, "birth_date": "2008-01-01", "card_number": 126, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "aaf6ed02-3da5-4717-8bff-d4ad231b3cca", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Анастасия Максимовна", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41160000, "surname": "Артюхова", "world_code": "", "year": 2008}, {"bib": 128, "birth_date": "2008-01-01", "card_number": 128, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "4de5f749-e043-4de7-a264-ac8ff7697402", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Полина Сергеевна", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41280000, "surname": "Хлебородова", "world_code": "", "year": 2008}, {"bib": 130, "birth_date": "2009-01-01", "card_number": 130, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "7d027816-cc6d-4329-9ea9-9777f4b859f7", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Екатерина Викторовна", "national_code": 0, "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41400000, "surname": "Михайлова", "world_code": "", "year": 2009}, {"bib": 132, "birth_date": "2008-01-01", "card_number": 132, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "e7a39cf7-aeff-4fe8-9188-e5c04d3fbbb8", "id": "31587116-bd81-40b4-bbfb-61b7b5a2e15c", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Полина Сергеевна", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41520000, "surname": "Волкова", "world_code": "", "year": 2008}, {"bib": 1, "birth_date": "2008-01-01", "card_number": 1, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "93a490d6-05f8-43da-8c5e-35bffc9145fb", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Степан Михайлович", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 39660000, "surname": "Щетинин", "world_code": "", "year": 2008}, {"bib": 3, "birth_date": "2009-01-01", "card_number": 3, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "14cf1e35-298e-41c2-9cc5-256df8f3810d", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Максим Сергеевич", "national_code": 0, "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 39780000, "surname": "Лохмачёв", "world_code": "", "year": 2009}, {"bib": 5, "birth_date": "2009-01-01", "card_number": 5, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "9d93207d-7e02-47dc-942c-90fd6cb7dfdb", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Илья Валерьевич", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 39900000, "surname": "Астраханов", "world_code": "", "year": 2009}, {"bib": 7, "birth_date": "2009-01-01", "card_number": 7, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "e6e7ebfd-babf-4662-a378-d4f0f8aec083", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Александр Олегович", "national_code": "0", "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40020000, "surname": "Кондрашов", "world_code": "", "year": 2009}, {"bib": 9, "birth_date": "2008-01-01", "card_number": 9, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "7b1281eb-72ed-432a-90a0-0ca4f447ddd8", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Илья Алексеевич", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40140000, "surname": "Собин", "world_code": "", "year": 2008}, {"bib": 11, "birth_date": "2008-01-01", "card_number": 11, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "bad9bf4d-decc-4c00-8cd7-4dbd00ed1620", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Артем Максимович", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40260000, "surname": "Поздняков", "world_code": "", "year": 2008}, {"bib": 13, "birth_date": "2009-01-01", "card_number": 13, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "7cae13b0-bf0e-4aab-981a-e38cdd60c1f4", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Артемий Евгеньевич", "national_code": 0, "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40380000, "surname": "Субботин", "world_code": "", "year": 2009}, {"bib": 15, "birth_date": "2008-01-01", "card_number": 15, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "186bafc7-b1bc-46a1-aca4-f01cc9b9a0ee", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Ярослав Константинович", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40500000, "surname": "Зарыгин", "world_code": "", "year": 2008}, {"bib": 17, "birth_date": "2008-01-01", "card_number": 17, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "5498495f-56bd-48ef-8df4-6c7fea5a2005", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Вадим Максимович", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40620000, "surname": "Егоров", "world_code": "", "year": 2008}, {"bib": 19, "birth_date": "2008-01-01", "card_number": 19, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "ae808fe4-709f-4de9-b611-1124d8731dfc", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Кирилл Андреевич", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40740000, "surname": "Шаханов", "world_code": "", "year": 2008}, {"bib": 21, "birth_date": "2008-01-01", "card_number": 21, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение средняя общеобразовательная школа N 1, Аббревиатура образовательной организации: МБОУ СОШ N 1, ФИО представителя команды: Трошенкова Анна Витальевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "22afe975-c01c-40dc-9b5d-cbf829487e20", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Иван Вячеславович", "national_code": 0, "object": "Person", "organization_id": "3edace97-12a0-4154-949a-31feed48b69f", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40860000, "surname": "Безуглый", "world_code": "", "year": 2008}, {"bib": 23, "birth_date": "2009-01-01", "card_number": 23, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "501b71ab-5641-40be-b535-4155abdb9de7", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Никита Сергеевич", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 40980000, "surname": "Иванов", "world_code": "", "year": 2009}, {"bib": 25, "birth_date": "2008-01-01", "card_number": 25, "comment": "Полное наименовани образовательной организации: Муниципальное бюджетное общеобразовательное учреждение \u0027Средняя общеобразовательная  школа 19\u0027, Аббревиатура образовательной организации: МБОУ СОШ19 , ФИО представителя команды: Осипенко Любовь Юрьевна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "1c5e9f68-3e3d-4d48-ac7d-3ece1262a6c2", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Сергей Эдуардович", "national_code": 0, "object": "Person", "organization_id": "f90f0bc8-9c76-4888-a519-c5b4740bed8d", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41100000, "surname": "Грачев", "world_code": "", "year": 2008}, {"bib": 27, "birth_date": "2008-01-01", "card_number": 27, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "8b337268-6a9c-44d6-b3d5-1209a9e409ee", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Данила Дмитриевич", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41220000, "surname": "Гусев", "world_code": "", "year": 2008}, {"bib": 29, "birth_date": "2008-01-01", "card_number": 29, "comment": "Полное наименовани образовательной организации: Муниципальное общеобразовательное  учреждение  средняя  общеобразовательная  школа № 1, Аббревиатура образовательной организации: МОУ СОШ № 1, ФИО представителя команды: Смирнова  Ирина Михайловна", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "1c08367c-6d18-4cfc-b5a0-a03ae68b738c", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Владислав Александрович", "national_code": 0, "object": "Person", "organization_id": "52a703bb-3834-4e3a-a23c-10dd60b524db", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41340000, "surname": "Скобелев", "world_code": "", "year": 2008}, {"bib": 31, "birth_date": "2008-01-01", "card_number": 31, "comment": "Полное наименовани образовательной организации: Муниципальное казенное образовательное учреждение средняя общеобразовательная школа ЗАТО Солнечный, Аббревиатура образовательной организации: СКОК СОШ ЗАТО Солнечный, ФИО представителя команды: Алексеев Павел Николаевич", "group_id": "4597d989-e12b-46b9-baff-d2282820c529", "id": "188cf0d6-8950-4455-b541-3e7d8cc83cbe", "is_out_of_competition": false, "is_paid": false, "is_personal": false, "is_rented_card": false, "name": "Артём Аликович", "national_code": 0, "object": "Person", "organization_id": "1cc4ed64-02e4-487b-bcc6-445780054527", "qual": 0, "sex": 0, "start_group": 0, "start_time": 41460000, "surname": "Коновалов", "world_code": "", "year": 2008}], "results": [], "settings": {"is_corridor_minute_number": true, "is_corridor_order_number": false, "is_fixed_number_interval": false, "is_fixed_start_interval": true, "is_mix_groups": false, "is_split_regions": false, "is_split_start_groups": false, "is_split_teams": true, "is_start_preparation_draw": true, "is_start_preparation_numbers": true, "is_start_preparation_reserve": false, "is_start_preparation_time": true, "numbers_first": 1, "numbers_interval": 1, "reserve_count": 1, "reserve_percent": 0, "reserve_prefix": "_Резерв", "start_first_time": 39720000, "start_interval": 120000, "start_one_minute_qty": 1, "system_zero_time": [11, 0, 0]}};
+  racePreparation(race);
+
+  function getStartListByGroup(group) {
+      var isRelay = group.__type ? group.__type === 3 : race.data.race_type === 3;
+      var results = [];
+      for (var _i = 0, _a = race.persons; _i < _a.length; _i++) {
+          var person = _a[_i];
+          if (person.group && person.group.id === group.id) {
+              results.push({
+                  index: 0,
+                  name: person.surname + ' ' + person.name,
+                  org: (person.organization && String(person.organization.name).slice(0, MAX_ORG_NAME)) || '',
+                  qual: Qualification[person.qual],
+                  bib: person.bib,
+                  card_number: person.card_number,
+                  year: person.birth_date ? (new Date(person.birth_date)).getFullYear() : '',
+                  start: toHHMMSS(person.start_time),
+                  start_time: person.start_time
+              });
+          }
+      }
+      results.sort(function (a, b) {
+          if (isRelay && a.start_time === b.start_time) {
+              if (a.bib % 1000 === b.bib % 1000) {
+                  return ~~(a.bib / 1000) - ~~(b.bib / 1000)
+              } else {
+                  return a.bib % 1000 - b.bib % 1000
+              }
+          }
+          if (a.start_time === b.start_time) {
+              return a.bib - b.bib;
+          }
+          return a.start_time - b.start_time
+      });
+      var index = 0;
+      results.forEach(function (elem) {
+          index++;
+          elem.index = index
+      });
+      if (isRelay) {
+          index = 0;
+          var prevBib = 0;
+          var resultsList = results.slice();
+          results = [];
+          for (var _i = 0, resultsList_ = resultsList; _i < resultsList_.length; _i++) {
+              var r = resultsList_[_i];
+              r.index = '';
+              if (r.bib % 1000 !== prevBib) {
+                  index++;
+                  results.push({index: index});
+                  prevBib = r.bib % 1000;
+              }
+              results.push(r);
+          }
+      }
+      return results;
+  }
+
+  var Fields = {
+      fields: [
+          {key: 'index', title: '№', size: 4},
+          {key: 'name', title: 'Фамилия, имя', size: 30},
+          {key: 'org', title: 'Коллектив', size: 20},
+          {key: 'year', title: 'ГР', size: 5},
+          {key: 'qual', title: 'Разряд', size: 7},
+          {key: 'bib', title: 'Номер', size: 6},
+          {key: 'card_number', title: 'Номер чипа', size: 11},
+          {key: 'start', title: 'Время старта', size: 13}
+      ],
+      active: function (key, val) {
+          for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+              var obj = _a[_i];
+              if (key === obj.key) {
+                  obj.active = val;
+              }
+          }
+      },
+      isActive: function (key) {
+          for (var _i = 0, _a = this.fields; _i < _a.length; _i++) {
+              var obj = _a[_i];
+              if (key === obj.key) {
+                  if (obj.active === void 0) {
+                      return true;
+                  }
+                  else {
+                      return !!obj.active;
+                  }
+              }
+          }
+          return false;
+      },
+      init: function () {
+          return this;
+      }
+  }.init();
+
+  var store = {};
+
+  function render() {
+      var resultBlock = document.getElementById('start-list-tables');
+      resultBlock.innerHTML = '';
+      for (var _i = 0, _a = race.groups; _i < _a.length; _i++) {
+          var group = _a[_i];
+          var titleBlock = document.createElement('h2');
+          titleBlock.id = group.name;
+          titleBlock.appendChild(document.createTextNode(group.name));
+          resultBlock.appendChild(titleBlock);
+          resultBlock.appendChild(getGroupsBlockElement(race));
+          if (store.tableView) {
+              resultBlock.appendChild(new TableGenerator(getStartListByGroup(group), Fields.fields).getTable({className: 'sportorg-table'}));
+          } else {
+              resultBlock.appendChild(new TableTextGenerator(getStartListByGroup(group), Fields.fields).getTable());
+          }
+      }
+  }
+  render();
+
+  var Scrolling = {
+      direction: 1,
+      enabled: false,
+      lock: false,
+      prev: 0,
+      intervalTimer: 0,
+      init: function () {
+          var _this = this;
+          if (_this.intervalTimer) {
+              clearInterval(_this.intervalTimer)
+          }
+          _this.intervalTimer = setInterval(function () {
+              _this.lock = !_this.lock;
+          }, 5000);
+          window.onscroll = function () {
+              var d = document.documentElement;
+              var offset = d.scrollTop + window.innerHeight;
+              var height = d.offsetHeight;
+
+              if (offset === height) {
+                  _this.direction = -1;
+              }
+              if (offset <= window.innerHeight) {
+                  _this.direction = 1;
+              }
+          };
+          this.pageScroll();
+          return this;
+      },
+      pageScroll: function () {
+          var _this = this;
+          if (_this.enabled && ! _this.lock) {
+              window.scrollBy(10, _this.direction);
+          }
+          setTimeout(function () {
+              _this.pageScroll();
+          }, 10);
+      }
+  }.init();
+
+  new SettingsGenerator([
+      {
+          title: 'Табличный вид',
+          value: !!store.tableView,
+          change: function (checked) {
+              store.tableView = checked;
+              render()
+          }
+      },
+      {
+          title: 'Номер',
+          value: Fields.isActive('bib'),
+          change: function (checked) {
+              Fields.active('bib', checked);
+              render()
+          }
+      },
+      {
+          title: 'Номер чипа',
+          value: Fields.isActive('card_number'),
+          change: function (checked) {
+              Fields.active('card_number', checked);
+              render()
+          }
+      },
+      {
+          title: 'Автоскролл',
+          value: Scrolling.enabled,
+          change: function (checked) {
+              Scrolling.enabled = checked;
+          }
+      },
+  ]).show();
+</script>
+ </div>
+    <div id="footer">
+       
+    </div>
+  </body>
+</html>
